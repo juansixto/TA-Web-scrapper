@@ -49,6 +49,7 @@ public class Main {
 			Document doc = Jsoup.connect(URL).get();
 			Elements reviews = null;
 			Elements titles = null;
+			Elements ratings = null;
 			String url = URL;
 			int numberOfReviews = getNumberOfReviews(doc);
 			String POIName = getPOIName(doc);
@@ -62,6 +63,8 @@ public class Main {
 					doc = Jsoup.connect(url).get();
 					reviews = doc.select(".partial_entry");
 					titles = doc.select(".quote > a");
+					ratings = doc.select(".reviewItemInLine");
+					System.out.println(ratings.size());
 					int titlesNum = 0;
 					for(int j = 0; j < reviews.size(); j++) {
 						
@@ -82,7 +85,7 @@ public class Main {
 							}
 								String tittleTemp = titles.get(titlesNum++).text();
 								reviewList.add(tittleTemp + " --> " + fullReview.text());
-								System.out.println(tittleTemp + " --> " + fullReview.text());
+								System.out.println(ratings.get(j).text() + " -- " + tittleTemp + " --> " + fullReview.text());
 						}	
 					}
 					
