@@ -83,9 +83,9 @@ public class Main {
 								String code = "r" + html.substring(num+7, num+16);
 								fullReview = getFullReview(code);
 							}
-								String tittleTemp = titles.get(titlesNum++).text();
+								String tittleTemp = titles.get(titlesNum).text();
 								reviewList.add(tittleTemp + " --> " + fullReview.text());
-								System.out.println(ratings.get(j).text() + " -- " + tittleTemp + " --> " + fullReview.text());
+								System.out.println(ratings.get(titlesNum).html().substring(ratings.get(titlesNum).html().indexOf("content")+9, ratings.get(titlesNum++).html().indexOf("content")+10) + " -- " + tittleTemp + " --> " + fullReview.text());
 						}	
 					}
 					
