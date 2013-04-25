@@ -4,19 +4,19 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import models.Review;
-
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
-public class Main {
-	
+import models.Review;
+
+public class Main2 {
+
 	private static String URL = "http://www.tripadvisor.co.uk/Hotel_Review-g503819-d571157-Reviews-Premier_Inn_Manchester_Salford_Quays-Salford_Greater_Manchester_England.html";
 	private static String URL2 = "http://www.tripadvisor.co.uk/ShowUserReviews-g503819-d571157-Reviews-Premier_Inn_Manchester_Salford_Quays-Salford_Greater_Manchester_England.html#CHECK_RATES_CONT";
 	private static List<Review> reviewList = new ArrayList<>();
-
+	
 	public static int getNumberOfReviews(Document doc) {
 
 		String StrNumberOfReviews = doc.select(".reviews_header").text();
@@ -30,15 +30,21 @@ public class Main {
 		return heading;
 	}
 	
-	public static Element getFullReview(String code) {
+	public static Review getFullReview(String code) {
 		String url = URL2.replace("-Reviews-", "-"+code+"-");
+		System.out.println(url);
 		Document doc;
-		Element fullReview = null;
+		Review fullReview = new Review();
 		try {
 			doc = Jsoup.connect(url).get();
 			Elements reviews = doc.select(".entry");
-			fullReview = reviews.get(0);
-			
+			System.out.println(reviews.get(0).text());
+			fullReview.setText(reviews.get(0).text());
+			Elements rs = doc.select(".ratingDate");
+			System.out.println(rs.get(0).text().substring(9, 22));
+			fullReview.setDate(rs.get(0).text().substring(9, 22));
+			rs = doc.select(".col2of2");
+			System.out.println(rs.get(3).html());
 		} catch (IOException e) {
 			System.err.println("Error: " + e.getMessage());
 		}
@@ -51,57 +57,35 @@ public class Main {
 			Document doc = Jsoup.connect(URL).get();
 			Elements reviews = null;
 			Elements titles = null;
-			Elements ratings = null;
-			Elements ratingsT = null;
 			String url = URL;
 			int numberOfReviews = getNumberOfReviews(doc);
 			String POIName = getPOIName(doc);
 			System.out.println(POIName);
 			System.out.println("Numero de Reviews: "+numberOfReviews);
-
+			
 			if(numberOfReviews != 0) {
 				for(int i = 0; i < (numberOfReviews/10 + 1); i++) {
 					if(i != 0) {
 						url = URL.replace("Reviews-", "Reviews-or"+i*10+"-");
 					}
 					doc = Jsoup.connect(url).get();
-					reviews = doc.select(".partial_entry");
 					titles = doc.select(".quote > a");
-					ratings = doc.select(".reviewItemInLine");
-					int titlesNum = 0;
-					for(int j = 0; j < reviews.size(); j++) {
-						
-
-						String review = reviews.get(j).text();
-						if(!reviews.get(j).html().contains("<span id=\"respons"))
-						{
-							review = review.replaceAll("\"", "");
-							if(!review.endsWith(".")) {
-								review += ".";
-							}
-							String html = reviews.get(j).html();
-							Element fullReview = reviews.get(j);
-							int num = html.indexOf("review_");
-							if (num > -1){
-								String code = "r" + html.substring(num+7, num+16);
-								fullReview = getFullReview(code);
-							}
-								String tittleTemp = titles.get(titlesNum).text();
-								int reviewRate = Integer.parseInt(ratings.get(titlesNum).html().substring(ratings.get(titlesNum).html().indexOf("content")+9, ratings.get(titlesNum++).html().indexOf("content")+10));
-								Review reviewTemp = new Review(tittleTemp, fullReview.text(),reviewRate );
-								reviewList.add(reviewTemp);
-								System.out.println(reviewTemp.toString());
-						}	
+					for(int j = 0; j < titles.size(); j++) {
+						Review r = new Review();
+						r.setTitle(titles.get(j).html());
+						System.out.println(titles.get(j).toString());
+						int num = titles.get(j).toString().indexOf("id=");
+						String id = titles.get(j).toString().substring(num+4,num+14);
+						r = getFullReview(id);
 					}
-					
-					
 				}
 			}
-			System.out.println("End");
+
 		}
 		catch (Exception e) {
 				System.err.println("Error: " + e.getMessage());
 			}
+
 	}
 
 }
