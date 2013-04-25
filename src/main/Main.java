@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import models.Review;
+
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -13,7 +15,7 @@ public class Main {
 	
 	private static String URL = "http://www.tripadvisor.co.uk/Hotel_Review-g503819-d571157-Reviews-Premier_Inn_Manchester_Salford_Quays-Salford_Greater_Manchester_England.html";
 	private static String URL2 = "http://www.tripadvisor.co.uk/ShowUserReviews-g503819-d571157-Reviews-Premier_Inn_Manchester_Salford_Quays-Salford_Greater_Manchester_England.html#CHECK_RATES_CONT";
-	private static List<String> reviewList = new ArrayList<>();
+	private static List<Review> reviewList = new ArrayList<>();
 
 	public static int getNumberOfReviews(Document doc) {
 		String StrNumberOfReviews = doc.select(".reviews_header").text();
@@ -50,6 +52,7 @@ public class Main {
 			Elements reviews = null;
 			Elements titles = null;
 			Elements ratings = null;
+			Elements ratingsT = null;
 			String url = URL;
 			int numberOfReviews = getNumberOfReviews(doc);
 			String POIName = getPOIName(doc);
@@ -64,7 +67,9 @@ public class Main {
 					reviews = doc.select(".partial_entry");
 					titles = doc.select(".quote > a");
 					ratings = doc.select(".reviewItemInLine");
-					System.out.println(ratings.size());
+					ratingsT = doc.select(".recommend-column first");
+					System.out.println(ratingsT.size());
+					System.out.println(ratingsT.html());
 					int titlesNum = 0;
 					for(int j = 0; j < reviews.size(); j++) {
 						
@@ -84,8 +89,10 @@ public class Main {
 								fullReview = getFullReview(code);
 							}
 								String tittleTemp = titles.get(titlesNum).text();
-								reviewList.add(tittleTemp + " --> " + fullReview.text());
-								System.out.println(ratings.get(titlesNum).html().substring(ratings.get(titlesNum).html().indexOf("content")+9, ratings.get(titlesNum++).html().indexOf("content")+10) + " -- " + tittleTemp + " --> " + fullReview.text());
+								int reviewRate = Integer.parseInt(ratings.get(titlesNum).html().substring(ratings.get(titlesNum).html().indexOf("content")+9, ratings.get(titlesNum++).html().indexOf("content")+10));
+								Review reviewTemp = new Review(tittleTemp, fullReview.text(),reviewRate );
+								reviewList.add(reviewTemp);
+								System.out.println(reviewTemp.toString());
 						}	
 					}
 					
