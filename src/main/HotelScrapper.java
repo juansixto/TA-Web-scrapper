@@ -5,8 +5,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -15,12 +13,24 @@ import org.jsoup.select.Elements;
 import models.Review;
 import models.User;
 
-public class Main2 {
-
+public class HotelScrapper {
 	private static String URL = "http://www.tripadvisor.co.uk/Hotel_Review-g503819-d571157-Reviews-Premier_Inn_Manchester_Salford_Quays-Salford_Greater_Manchester_England.html";
 	private static String URL2 = "http://www.tripadvisor.co.uk/ShowUserReviews-g503819-d571157-Reviews-Premier_Inn_Manchester_Salford_Quays-Salford_Greater_Manchester_England.html#CHECK_RATES_CONT";
 	private static List<Review> reviewList = new ArrayList<>();
+	private static FileWriter file;
 	
+	public HotelScrapper(String url, String name){
+		
+		this.URL = url;
+		this.URL2 = url.replace("Hotel_Review", "ShowUserReviews")+"#CHECK_RATES_CONT"; 
+		try {
+			this.file = new FileWriter("corpus/"+name + ".json");
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+	}
 	public static int getNumberOfReviews(Document doc) {
 
 		String StrNumberOfReviews = doc.select(".reviews_header").text();
@@ -99,7 +109,7 @@ public class Main2 {
 
 	}
 
-	public static void main(String[] args) {
+	public static List<Review> extract() {
 		try {
 			Document doc = Jsoup.connect(URL).get();
 			Elements titles = null;
@@ -109,8 +119,8 @@ public class Main2 {
 			String POIName = getPOIName(doc);
 			System.out.println(POIName);
 			System.out.println("Numero de Reviews: "+numberOfReviews);
-			FileWriter file = new FileWriter("corpus.json");
-						
+			
+			
 			if(numberOfReviews != 0) {
 				for(int i = 0; i < (numberOfReviews/10 + 1); i++) {
 					if(i != 0) {
@@ -120,7 +130,6 @@ public class Main2 {
 					titles = doc.select(".quote > a");
 					ratings = doc.select(".reviewItemInLine");
 					for(int j = 0; j < titles.size(); j++) {
-						System.out.println("Review " + (reviewList.size()+1));
 						Review r = new Review();		
 						int num = titles.get(j).toString().indexOf("id=");
 						String id = titles.get(j).toString().substring(num+4,num+14);
@@ -128,9 +137,9 @@ public class Main2 {
 						r.setTitle(titles.get(j).html());
 						int reviewRate = Integer.parseInt(ratings.get(j).html().substring(ratings.get(j).html().indexOf("content")+9, ratings.get(j).html().indexOf("content")+10));
 						r.setRating(reviewRate);
-						r.print();
 						reviewList.add(r);
-						file.write(r.toJSON().toString() + ",");
+						file.write(r.toJSON().toString());
+						System.out.println(reviewList.size() + "/" + numberOfReviews );
 					}
 				}
 			}
@@ -140,8 +149,9 @@ public class Main2 {
 		catch (Exception e) {
 				System.err.println("Error: " + e.getMessage());
 			}
-
+		return reviewList;
 
 	}
+
 
 }

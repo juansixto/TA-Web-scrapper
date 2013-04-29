@@ -1,5 +1,10 @@
 package models;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+
+
 public class Review {
 	
 	public User getUser() {
@@ -103,6 +108,25 @@ public class Review {
 		System.out.println("Cleanliness:" + this.cleanliness);
 		System.out.println("Service:" + this.service);
 		System.out.println("==========================================================");
+	}
+	public 	JSONObject toJSON(){
+		JSONObject obj = new JSONObject();
+		try {
+			obj.put("title", this.title);
+			obj.put("text", this.text);
+			obj.put("date", this.date);
+			obj.put("value", this.value);
+			obj.put("location", this.location);
+			obj.put("sleepQ", this.sleepQ);
+			obj.put("rooms", this.rooms);
+			obj.put("cleanliness", this.cleanliness);
+			obj.put("service", this.service);
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		return obj;
 	}
 	
 
