@@ -32,19 +32,22 @@ public class Main2 {
 	
 	public static Review getFullReview(String code) {
 		String url = URL2.replace("-Reviews-", "-"+code+"-");
-		System.out.println(url);
 		Document doc;
 		Review fullReview = new Review();
+		System.out.println(url);
 		try {
 			doc = Jsoup.connect(url).get();
 			Elements reviews = doc.select(".entry");
-			System.out.println(reviews.get(0).text());
 			fullReview.setText(reviews.get(0).text());
 			Elements rs = doc.select(".ratingDate");
-			System.out.println(rs.get(0).text().substring(9, 22));
-			fullReview.setDate(rs.get(0).text().substring(9, 22));
+			fullReview.setDate(rs.get(0).text().substring(9, rs.get(0).text().length()));
 			rs = doc.select(".col2of2");
-			System.out.println(rs.get(3).html());
+			fullReview.setValue(getRating(rs.get(3),"Value</li>"));
+			fullReview.setLocation(getRating(rs.get(3),"Location</li> "));
+			fullReview.setSleepQ(getRating(rs.get(3),"Sleep Quality</li> "));
+			fullReview.setRooms(getRating(rs.get(3),"Rooms</li> "));
+			fullReview.setCleanliness(getRating(rs.get(3),"Cleanliness</li> "));
+			fullReview.setService(getRating(rs.get(3),"Service</li> "));
 		} catch (IOException e) {
 			System.err.println("Error: " + e.getMessage());
 		}
@@ -52,11 +55,22 @@ public class Main2 {
 	}
 	
 	
+	private static float getRating(Element element, String string) {
+		int index = element.html().indexOf(string);
+		if(index > -1){
+			return Float.parseFloat(element.html().substring(index-16, index-13));
+		} else {
+			return 0;
+		}
+
+	}
+
 	public static void main(String[] args) {
 		try {
 			Document doc = Jsoup.connect(URL).get();
 			Elements reviews = null;
 			Elements titles = null;
+			Elements ratings = null;
 			String url = URL;
 			int numberOfReviews = getNumberOfReviews(doc);
 			String POIName = getPOIName(doc);
@@ -70,13 +84,17 @@ public class Main2 {
 					}
 					doc = Jsoup.connect(url).get();
 					titles = doc.select(".quote > a");
+					ratings = doc.select(".reviewItemInLine");
 					for(int j = 0; j < titles.size(); j++) {
 						Review r = new Review();
-						r.setTitle(titles.get(j).html());
-						System.out.println(titles.get(j).toString());
+						System.out.println(titles.get(j).html());		
 						int num = titles.get(j).toString().indexOf("id=");
 						String id = titles.get(j).toString().substring(num+4,num+14);
 						r = getFullReview(id);
+						r.setTitle(titles.get(j).html());
+						int reviewRate = Integer.parseInt(ratings.get(j).html().substring(ratings.get(j).html().indexOf("content")+9, ratings.get(j).html().indexOf("content")+10));
+						r.setRating(reviewRate);
+						r.print();
 					}
 				}
 			}
