@@ -10,6 +10,7 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import models.Review;
+import models.User;
 
 public class Main2 {
 
@@ -48,6 +49,9 @@ public class Main2 {
 			fullReview.setRooms(getRating(rs.get(3),"Rooms</li> "));
 			fullReview.setCleanliness(getRating(rs.get(3),"Cleanliness</li> "));
 			fullReview.setService(getRating(rs.get(3),"Service</li> "));
+			User user = new User();
+			user = getUser(doc);
+			fullReview.setUser(user);
 		} catch (IOException e) {
 			System.err.println("Error: " + e.getMessage());
 		}
@@ -55,6 +59,34 @@ public class Main2 {
 	}
 	
 	
+	private static User getUser(Document doc) {
+		User user = new User();
+		Elements users = doc.select(".username");
+		user.setNick(users.get(0).text());
+		users = doc.select(".location");
+		user.setLocation(users.get(0).text());
+		users = doc.select(".col1of2");
+		Element contributor = users.get(1);
+		Elements attribs = contributor.select(".badgeText");
+			for(int i = 0; i < attribs.size(); i++){
+					String text = attribs.get(i).text();
+					if(text.indexOf("hotel")>-1){
+						user.setHotelReviews(Integer.parseInt(text.substring(0, text.indexOf("hotel")-1)));
+					}
+					else if(text.indexOf("review")>-1){
+						user.setReviews(Integer.parseInt(text.substring(0, attribs.get(0).text().indexOf("rev")-1)));
+					}
+					else if(text.indexOf("cities")>-1){
+						user.setCities(Integer.parseInt(text.substring(text.indexOf("in")+3, text.indexOf("cities")-1)));
+					}
+					else if(text.indexOf("helpful")>-1){
+						user.setHelpful(Integer.parseInt(text.substring(0, text.indexOf("helpful")-1)));
+					}
+			}		
+
+		return null;
+	}
+
 	private static float getRating(Element element, String string) {
 		int index = element.html().indexOf(string);
 		if(index > -1){
@@ -68,7 +100,6 @@ public class Main2 {
 	public static void main(String[] args) {
 		try {
 			Document doc = Jsoup.connect(URL).get();
-			Elements reviews = null;
 			Elements titles = null;
 			Elements ratings = null;
 			String url = URL;

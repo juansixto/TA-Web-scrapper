@@ -2,6 +2,12 @@ package models;
 
 public class Review {
 	
+	public User getUser() {
+		return user;
+	}
+	public void setUser(User user) {
+		this.user = user;
+	}
 	private String title;
 	private String text;
 	private String date;
@@ -11,6 +17,7 @@ public class Review {
 	private float rooms;
 	private float cleanliness;
 	private float service;
+	private User user;
 	
 	public float getValue() {
 		return value;
