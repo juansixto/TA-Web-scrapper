@@ -121,6 +121,12 @@ public class Review {
 			obj.put("rooms", this.rooms);
 			obj.put("cleanliness", this.cleanliness);
 			obj.put("service", this.service);
+			obj.put("User", this.user.getNick());
+			obj.put("Reviews", this.user.getReviews());
+			obj.put("Location", this.user.getLocation());
+			obj.put("hotelReviews", this.user.getHotelReviews());
+			obj.put("Cities", this.user.getCities());
+			obj.put("Helpful", this.user.getHelpful());
 		} catch (JSONException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

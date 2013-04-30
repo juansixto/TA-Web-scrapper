@@ -8,28 +8,46 @@ import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
 
 public class CityScrapper {
-
-	private static String URL = "http://www.tripadvisor.co.uk/Hotels-g187052-Greater_Manchester_England-Hotels.html";
+	private static String URL = "http://www.tripadvisor.co.uk/Hotels-g187052-oa0-Greater_Manchester_England-Hotels.html#ACCOM_OVERVIEW";
 	private static List<String> hotelList = new ArrayList<>();
+	
+	
+	public static int getNumberOfReviews(Document doc) {
+
+		String StrNumberOfReviews = doc.select(".pgCount").get(0).text();
+		StrNumberOfReviews= (StrNumberOfReviews.substring(0,StrNumberOfReviews.indexOf(" of ")));
+		int numberOfReviews = Integer.parseInt(StrNumberOfReviews);
+		return numberOfReviews;
+	}
 	
 	public static void main(String[] args) {
 		try {
-			Document doc = Jsoup.connect(URL).get();
-			Elements hotels = doc.select(".quality");
-			for(int i=0; i < hotels.size(); i++){
-				String hotel = hotels.get(i).html().substring(9,hotels.get(i).html().indexOf("class=")-2);
-				hotelList.add(hotel);
-			}
-			for(int j=0; j < hotels.size(); j++){
-				System.out.println("Hotel "+ j + " de " +hotels.size());
-				HotelScrapper hs = new HotelScrapper("http://www.tripadvisor.co.uk"+hotelList.get(j), "Hotel"+j);
-				hs.extract();
+			String url = URL;	
+			Document doc = Jsoup.connect(url).get();
+			int numberOfReviews = getNumberOfReviews(doc);
+			if(numberOfReviews != 0) {
+				for(int k = 0; k < (numberOfReviews/10 + 1); k++) {
+					if(k != 0) {
+						url = URL.replace("-oa0-", "-oa"+k*10+"-");
+					}	
+					doc = Jsoup.connect(url).get();
+					Elements hotels = doc.select(".quality");
+					for(int i=0; i < hotels.size(); i++){
+						String hotel = hotels.get(i).html().substring(9,hotels.get(i).html().indexOf("class=")-2);
+						hotelList.add(hotel);
+					}
+					for(int j=0; j < hotels.size(); j++){
+						System.out.println("Hotel "+ ((k*10)+j) + " de " +numberOfReviews);
+						HotelScrapper hs = new HotelScrapper("http://www.tripadvisor.co.uk"+hotelList.get(j), "Hotel"+j);
+						hs.extract();
+					}
+				}
 			}
 		}
 		catch (Exception e) {
-				System.err.println("Error: " + e.getMessage());
-			}
-
+			System.err.println("Error: " + e.getMessage());
+		}
 	}
 
 }
+

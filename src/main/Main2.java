@@ -130,7 +130,7 @@ public class Main2 {
 						r.setRating(reviewRate);
 						r.print();
 						reviewList.add(r);
-						file.write(r.toJSON().toString() + ",");
+						file.write(r.toJSON().toString() + ","+"\n");
 					}
 				}
 			}

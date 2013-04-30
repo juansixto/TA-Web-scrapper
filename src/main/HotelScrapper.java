@@ -96,7 +96,7 @@ public class HotelScrapper {
 					}
 			}		
 
-		return null;
+		return user;
 	}
 
 	private static float getRating(Element element, String string) {
@@ -111,6 +111,7 @@ public class HotelScrapper {
 
 	public static List<Review> extract() {
 		try {
+			reviewList = new ArrayList<>();
 			Document doc = Jsoup.connect(URL).get();
 			Elements titles = null;
 			Elements ratings = null;
