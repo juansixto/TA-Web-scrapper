@@ -139,7 +139,7 @@ public class HotelScrapper {
 						int reviewRate = Integer.parseInt(ratings.get(j).html().substring(ratings.get(j).html().indexOf("content")+9, ratings.get(j).html().indexOf("content")+10));
 						r.setRating(reviewRate);
 						reviewList.add(r);
-						file.write(r.toJSON().toString());
+						file.write(r.toJSON().toString()+"\n");
 						System.out.println(reviewList.size() + "/" + numberOfReviews );
 					}
 				}

@@ -6,6 +6,19 @@ import org.json.JSONObject;
 
 
 public class Review {
+
+	private String title;
+	private String text;
+	private String date;
+	private double rating;
+	private double value;
+	private double location;
+	private double sleepQ;
+	private double rooms;
+	private double cleanliness;
+	private double service;
+	private User user;
+	
 	
 	public User getUser() {
 		return user;
@@ -13,51 +26,40 @@ public class Review {
 	public void setUser(User user) {
 		this.user = user;
 	}
-	private String title;
-	private String text;
-	private String date;
-	private float value;
-	private float location;
-	private float sleepQ;
-	private float rooms;
-	private float cleanliness;
-	private float service;
-	private User user;
-	
-	public float getValue() {
+	public double getValue() {
 		return value;
 	}
-	public void setValue(float value) {
-		this.value = value;
+	public void setValue(float f) {
+		this.value = f;
 	}
-	public float getLocation() {
+	public double getLocation() {
 		return location;
 	}
-	public void setLocation(float location) {
+	public void setLocation(double location) {
 		this.location = location;
 	}
-	public float getSleepQ() {
+	public double getSleepQ() {
 		return sleepQ;
 	}
-	public void setSleepQ(float sleepQ) {
+	public void setSleepQ(double sleepQ) {
 		this.sleepQ = sleepQ;
 	}
-	public float getRooms() {
+	public double getRooms() {
 		return rooms;
 	}
-	public void setRooms(float rooms) {
+	public void setRooms(double rooms) {
 		this.rooms = rooms;
 	}
-	public float getCleanliness() {
+	public double getCleanliness() {
 		return cleanliness;
 	}
-	public void setCleanliness(float cleanliness) {
+	public void setCleanliness(double cleanliness) {
 		this.cleanliness = cleanliness;
 	}
-	public float getService() {
+	public double getService() {
 		return service;
 	}
-	public void setService(float service) {
+	public void setService(double service) {
 		this.service = service;
 	}
 	public String getDate() {
@@ -66,17 +68,19 @@ public class Review {
 	public void setDate(String date) {
 		this.date = date;
 	}
-	private int rating;
+	
 	
 	public Review(){
 		this.title = "";
 		this.text = "";
 		this.rating = 0;
+		this.user = new User();
 	}
 	public Review(String title, String text, int rating){
 		this.title = title;
 		this.text = text;
 		this.rating = rating;
+		this.user = new User();
 	}
 	public String getTitle() {
 		return title;
@@ -90,10 +94,10 @@ public class Review {
 	public void setText(String text) {
 		this.text = text;
 	}
-	public int getRating() {
+	public double getRating() {
 		return rating;
 	}
-	public void setRating(int rating) {
+	public void setRating(double rating) {
 		this.rating = rating;
 	}
 	public String toString(){
@@ -116,6 +120,7 @@ public class Review {
 			obj.put("text", this.text);
 			obj.put("date", this.date);
 			obj.put("value", this.value);
+			obj.put("rating", this.rating);
 			obj.put("location", this.location);
 			obj.put("sleepQ", this.sleepQ);
 			obj.put("rooms", this.rooms);
@@ -133,6 +138,31 @@ public class Review {
 		}
 
 		return obj;
+	}
+	
+	public boolean fromJSON(JSONObject obj){
+		try {
+			this.title = obj.getString("title");
+			this.text = obj.getString("text");
+			this.date = obj.getString("date");
+			this.value = obj.getDouble("value");
+			this.rating = obj.getDouble("rating");
+			this.location = obj.getDouble("location");
+			this.sleepQ = obj.getDouble("sleepQ");
+			this.rooms = obj.getDouble("rooms");
+			this.cleanliness = obj.getDouble("cleanliness");
+			this.service = obj.getDouble("service");
+			this.user.setNick(obj.getString("User"));
+			this.user.setReviews(obj.getInt("Reviews"));
+			this.user.setLocation(obj.getString("Location"));
+			this.user.setHotelReviews(obj.getInt("hotelReviews"));
+			this.user.setCities(obj.getInt("Cities"));
+			this.user.setHelpful(obj.getInt("Helpful"));
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+		return false;
+		
 	}
 	
 

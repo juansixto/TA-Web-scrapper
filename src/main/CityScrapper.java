@@ -8,7 +8,7 @@ import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
 
 public class CityScrapper {
-	private static String URL = "http://www.tripadvisor.co.uk/Hotels-g187052-oa0-Greater_Manchester_England-Hotels.html#ACCOM_OVERVIEW";
+	private static String URL = "http://www.tripadvisor.co.uk/Hotels-g186403-oa0-Coventry_West_Midlands_England-Hotels.html#ACCOM_OVERVIEW";
 	private static List<String> hotelList = new ArrayList<>();
 	
 	
