@@ -101,7 +101,9 @@ public class Main2 {
 
 	public static void main(String[] args) {
 		try {
+			System.out.println("HAAA");
 			Document doc = Jsoup.connect(URL).get();
+			System.out.println(doc);
 			Elements titles = null;
 			Elements ratings = null;
 			String url = URL;

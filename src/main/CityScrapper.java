@@ -33,11 +33,12 @@ public class CityScrapper {
 					doc = Jsoup.connect(url).get();
 					Elements hotels = doc.select(".quality");
 					for(int i=0; i < hotels.size(); i++){
-						String hotel = hotels.get(i).html().substring(9,hotels.get(i).html().indexOf("class=")-2);
+						String hotel = hotels.get(i).html().substring(25,hotels.get(i).html().indexOf("id=")-3);
 						hotelList.add(hotel);
 					}
 					for(int j=0; j < hotels.size(); j++){
 						System.out.println("Hotel "+ ((k*10)+j) + " de " +numberOfReviews);
+						System.out.println("http://www.tripadvisor.co.uk"+hotelList.get(j));
 						HotelScrapper hs = new HotelScrapper("http://www.tripadvisor.co.uk"+hotelList.get(j), "Hotel"+j);
 						hs.extract();
 					}

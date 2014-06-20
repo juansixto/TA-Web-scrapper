@@ -24,7 +24,7 @@ public class HotelScrapper {
 		this.URL = url;
 		this.URL2 = url.replace("Hotel_Review", "ShowUserReviews")+"#CHECK_RATES_CONT"; 
 		try {
-			this.file = new FileWriter("corpus/"+name + ".json");
+			this.file = new FileWriter("corpus/new/"+name + ".json");
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -32,8 +32,8 @@ public class HotelScrapper {
 		
 	}
 	public static int getNumberOfReviews(Document doc) {
-
-		String StrNumberOfReviews = doc.select(".reviews_header").text();
+		//String StrNumberOfReviews = doc.select(".reviews_header").text();
+		String StrNumberOfReviews = doc.select(".inlineFldst").text();
 		StrNumberOfReviews = StrNumberOfReviews.replaceAll("\\D+","");
 		int numberOfReviews = Integer.parseInt(StrNumberOfReviews);
 		return numberOfReviews;
@@ -44,14 +44,15 @@ public class HotelScrapper {
 		return heading;
 	}
 	
-	public static Review getFullReview(String code) {
+	public static Review getFullReview(String code, Integer n) {
 		String url = URL2.replace("-Reviews-", "-"+code+"-");
 		Document doc;
 		Review fullReview = new Review();
 		try {
 			doc = Jsoup.connect(url).get();
 			Elements reviews = doc.select(".entry");
-			fullReview.setText(reviews.get(0).text());
+			fullReview.setText(reviews.get(n).text());
+			
 			Elements rs = doc.select(".ratingDate");
 			fullReview.setDate(rs.get(0).text().substring(9, rs.get(0).text().length()));
 			rs = doc.select(".col2of2");
@@ -102,7 +103,8 @@ public class HotelScrapper {
 	private static float getRating(Element element, String string) {
 		int index = element.html().indexOf(string);
 		if(index > -1){
-			return Float.parseFloat(element.html().substring(index-8, index-5));
+			System.out.println(element.html().substring(index-17, index-15));
+			return Float.parseFloat(element.html().substring(index-17, index-15));
 		} else {
 			return 0;
 		}
@@ -110,13 +112,18 @@ public class HotelScrapper {
 	}
 
 	public static List<Review> extract() {
+		
+		System.out.println(URL);
 		try {
 			reviewList = new ArrayList<>();
 			Document doc = Jsoup.connect(URL).get();
+
 			Elements titles = null;
 			Elements ratings = null;
 			String url = URL;
+
 			int numberOfReviews = getNumberOfReviews(doc);
+			
 			String POIName = getPOIName(doc);
 			System.out.println(POIName);
 			System.out.println("Numero de Reviews: "+numberOfReviews);
@@ -127,18 +134,25 @@ public class HotelScrapper {
 					if(i != 0) {
 						url = URL.replace("Reviews-", "Reviews-or"+i*10+"-");
 					}
+					
 					doc = Jsoup.connect(url).get();
+					
 					titles = doc.select(".quote > a");
 					ratings = doc.select(".reviewItemInLine");
 					for(int j = 0; j < titles.size(); j++) {
 						Review r = new Review();		
+						System.out.println(r);
 						int num = titles.get(j).toString().indexOf("id=");
 						String id = titles.get(j).toString().substring(num+4,num+14);
-						r = getFullReview(id);
-						r.setTitle(titles.get(j).html());
-						int reviewRate = Integer.parseInt(ratings.get(j).html().substring(ratings.get(j).html().indexOf("content")+9, ratings.get(j).html().indexOf("content")+10));
+						r = getFullReview(id,j);
+						System.out.println(r);
+						r.setTitle(titles.get(j).html().substring(24,titles.get(j).html().length()-8 ));
+						System.out.println(r);
+						int reviewRate = Integer.parseInt(ratings.get(j).html().substring(139,140));
 						r.setRating(reviewRate);
+						System.out.println(r);
 						reviewList.add(r);
+						System.out.println(r.toJSON().toString());
 						file.write(r.toJSON().toString()+"\n");
 						System.out.println(reviewList.size() + "/" + numberOfReviews );
 					}
